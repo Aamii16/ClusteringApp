@@ -3,713 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GraphClust - Social Media & Image Analysis</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- D3.js for graph visualization -->
+    <title>GraphCluster - Social Media & Image Analysis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-    
-    <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #1cc88a;
-            --dark-color: #5a5c69;
-            --light-color: #f8f9fc;
-        }
-        
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--light-color);
-        }
-        
-        .navbar-brand {
-            font-weight: 800;
-            color: var(--primary-color) !important;
-        }
-        
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
-            color: white;
-        }
-        
-        .sidebar-link {
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s;
-        }
-        
-        .sidebar-link:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .card {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid #e3e6f0;
-            font-weight: 700;
-            color: var(--dark-color);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-success {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-        
-        #visualization-area {
-            height: 500px;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .upload-area {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #f9f9f9;
-        }
-        
-        .upload-area:hover {
-            background-color: #f1f1f1;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-2 d-none d-md-block sidebar p-0">
-            <div class="position-sticky">
-                <div class="py-4 px-3 mb-4 text-center">
-                    <h3 class="fw-bold">GraphClust</h3>
-                    <p class="small mb-0">Graph Clustering Tool</p>
-                </div>
-                
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link sidebar-link active px-3 py-3" href="#">
-                            <i class="fas fa-home me-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link sidebar-link px-3 py-3" href="#">
-                            <i class="fas fa-upload me-2"></i>
-                            Data Import
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link sidebar-link px-3 py-3" href="#">
-                            <i class="fas fa-project-diagram me-2"></i>
-                            Clustering
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link sidebar-link px-3 py-3" href="#">
-                            <i class="fas fa-chart-bar me-2"></i>
-                            Analysis
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link sidebar-link px-3 py-3" href="#">
-                            <i class="fas fa-cog me-2"></i>
-                            Settings
-                        </a>
-                    </li>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <h2>GraphCluster</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active"><a href="#dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#social-analysis"><i class="fas fa-users"></i> Social Media</a></li>
+                    <li><a href="#image-analysis"><i class="fas fa-images"></i> Image Analysis</a></li>
+                    <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#help"><i class="fas fa-question-circle"></i> Help</a></li>
                 </ul>
-                
-                <div class="mt-5 px-3">
-                    <p class="small text-white-50 mb-0">© 2025 GraphClust</p>
-                    <p class="small text-white-50">Final Year Project</p>
-                </div>
-            </div>
+            </nav>
         </div>
-        
-        <!-- Main Content -->
-        <main class="col-md-10 ms-sm-auto px-4 py-3">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Graph Clustering Dashboard</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                        <i class="fas fa-calendar me-1"></i>
-                        Projects
-                    </button>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
                 </div>
-            </div>
-            
-            <!-- Quick Stats Row -->
-            <div class="row">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col">
-                                    <div class="text-xs text-uppercase mb-1 text-primary fw-bold">
-                                        Datasets
-                                    </div>
-                                    <div class="h5 mb-0 fw-bold text-gray-800">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-database fa-2x text-gray-300"></i>
-                                </div>
+                <div class="user-profile">
+                    <span>Welcome, User</span>
+                    <img src="https://via.placeholder.com/40" alt="User Avatar">
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h1>Dashboard</h1>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <h3>Projects</h3>
+                        <p>5</p>
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Datasets</h3>
+                        <p>12</p>
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Visualizations</h3>
+                        <p>24</p>
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+
+                <div class="recent-projects">
+                    <h2>Recent Projects</h2>
+                    <div class="project-list">
+                        <div class="project-card">
+                            <h3>Twitter Community Analysis</h3>
+                            <p>Spectral clustering of Twitter communities</p>
+                            <div class="project-meta">
+                                <span>Last updated: 3 days ago</span>
+                                <button class="btn-primary">Open</button>
+                            </div>
+                        </div>
+                        <div class="project-card">
+                            <h3>Instagram Image Categorization</h3>
+                            <p>K-means clustering for image classification</p>
+                            <div class="project-meta">
+                                <span>Last updated: 1 week ago</span>
+                                <button class="btn-primary">Open</button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="create-new">
+                    <h2>Start New Analysis</h2>
+                    <div class="new-options">
+                        <button class="new-btn" id="new-social">
+                            <i class="fas fa-users"></i>
+                            <span>New Social Media Analysis</span>
+                        </button>
+                        <button class="new-btn" id="new-image">
+                            <i class="fas fa-images"></i>
+                            <span>New Image Analysis</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Social Media Analysis Section -->
+            <section id="social-analysis" class="content-section">
+                <h1>Social Media Graph Clustering</h1>
                 
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col">
-                                    <div class="text-xs text-uppercase mb-1 text-success fw-bold">
-                                        Clusters
-                                    </div>
-                                    <div class="h5 mb-0 fw-bold text-gray-800">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-project-diagram fa-2x text-gray-300"></i>
-                                </div>
+                <div class="analysis-container">
+                    <div class="input-panel">
+                        <div class="panel-section">
+                            <h3>Data Source</h3>
+                            <div class="input-group">
+                                <label for="social-data-upload">Upload Dataset</label>
+                                <input type="file" id="social-data-upload">
                             </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col">
-                                    <div class="text-xs text-uppercase mb-1 text-info fw-bold">
-                                        Processing
-                                    </div>
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col-auto">
-                                            <div class="h5 mb-0 me-3 fw-bold text-gray-800">0%</div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="progress progress-sm">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-cogs fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col">
-                                    <div class="text-xs text-uppercase mb-1 text-warning fw-bold">
-                                        Saved Analysis
-                                    </div>
-                                    <div class="h5 mb-0 fw-bold text-gray-800">0</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-save fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Main Content Row -->
-            <div class="row">
-                <!-- Data Upload Area -->
-                <div class="col-lg-4">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold">Data Import</h6>
-                            <div class="dropdown no-arrow">
-                                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right shadow">
-                                    <a class="dropdown-item" href="#">Social Media Import</a>
-                                    <a class="dropdown-item" href="#">Image Folder Import</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#">CSV/JSON Import</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-							<form action="{{ url_for('upload_image') }}" method="post" enctype="multipart/form-data">
-								<div class="upload-area mb-3" id="uploadArea">
-									<i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
-									<h5>Upload Data</h5>
-									<p class="text-muted">Drag & drop files here or click to browse</p>
-									<input type="file" id="fileUpload" class="d-none" multiple>
-								</div>
-							</form>
-                            <button class="btn btn-primary btn-block w-100">
-                                <i class="fas fa-sync-alt me-1"></i> Import Data
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Algorithm Configuration -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold">Clustering Parameters</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group mb-3">
-                                <label for="algorithm" class="form-label">Algorithm:</label>
-                                <select class="form-select" id="algorithm">
-                                    <option selected value="kmeans">K-Means</option>
-                                    <option value="spectral">Spectral Clustering</option>
+                            <div class="input-group">
+                                <label for="data-format">Data Format</label>
+                                <select id="data-format">
+                                    <option value="csv">CSV</option>
+                                    <option value="json">JSON</option>
+                                    <option value="graphml">GraphML</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group mb-3">
-                                <label for="clusters" class="form-label">Number of Clusters (K):</label>
-                                <input type="range" class="form-range" min="2" max="20" value="5" id="clusters">
-                                <div class="d-flex justify-content-between">
-                                    <span>2</span>
-                                    <span id="clusterValue">5</span>
-                                    <span>20</span>
+                        </div>
+
+                        <div class="panel-section">
+                            <h3>Algorithm Selection</h3>
+                            <div class="input-group">
+                                <label>Clustering Method</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="kmeans-social" name="social-algorithm" checked>
+                                    <label for="kmeans-social">K-means</label>
+                                    <input type="radio" id="spectral-social" name="social-algorithm">
+                                    <label for="spectral-social">Spectral</label>
                                 </div>
                             </div>
-						<!-- Add this to the Clustering Parameters card -->
-						<div class="form-group mb-3">
-							<div class="d-flex justify-content-between align-items-center">
-								<label class="form-label mb-0">Find Optimal K:</label>
-								<button class="btn btn-outline-primary btn-sm" id="findOptimalK">
-									<i class="fas fa-chart-line me-1"></i> Run Elbow Method
-								</button>
-							</div>
-							<div class="form-text">Tests K values from 2-10 to find the optimal number of clusters</div>
-						</div>
+                            <div class="input-group">
+                                <label for="clusters-count">Number of Clusters</label>
+                                <input type="number" id="clusters-count" min="2" max="20" value="5">
+                            </div>
+                        </div>
 
-						<!-- Add this for showing the elbow method results -->
-						<div id="elbowMethodResult" class="mt-3 d-none">
-							<h6 class="mb-2">Elbow Method Results</h6>
-							<div id="elbowChart" style="height: 200px; width: 100%;"></div>
-							<div class="text-center mt-2">
-								<span class="badge bg-success">Suggested optimal K: <span id="optimalK">-</span></span>
-							</div>
-						</div>
-                            <div class="form-group mb-3">
-                                <label for="iterations" class="form-label">Max Iterations:</label>
-                                <input type="number" class="form-control" id="iterations" value="100">
+                        <div class="panel-section">
+                            <h3>Parameters</h3>
+                            <div class="input-group">
+                                <label for="max-iterations">Max Iterations</label>
+                                <input type="number" id="max-iterations" min="10" max="1000" value="100">
                             </div>
-                            
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="normalizeData" checked>
-                                <label class="form-check-label" for="normalizeData">
-                                    Normalize data
-                                </label>
+                            <div class="input-group">
+                                <label for="distance-metric">Distance Metric</label>
+                                <select id="distance-metric">
+                                    <option value="euclidean">Euclidean</option>
+                                    <option value="manhattan">Manhattan</option>
+                                    <option value="cosine">Cosine</option>
+                                </select>
                             </div>
-                            
-                            <button class="btn btn-success w-100">
-                                <i class="fas fa-play me-1"></i> Run Clustering
-                            </button>
+                        </div>
+
+                        <button class="btn-primary run-btn">Run Clustering</button>
+                    </div>
+
+                    <div class="visualization-panel">
+                        <div class="viz-controls">
+                            <h3>Graph Visualization</h3>
+                            <div class="viz-buttons">
+                                <button class="viz-btn active" data-viz="network"><i class="fas fa-project-diagram"></i> Network</button>
+                                <button class="viz-btn" data-viz="heatmap"><i class="fas fa-th"></i> Heatmap</button>
+                                <button class="viz-btn" data-viz="distribution"><i class="fas fa-chart-pie"></i> Distribution</button>
+                            </div>
+                        </div>
+                        <div class="viz-container">
+                            <div id="graph-visualization" class="viz-area">
+                                <div class="placeholder-viz">
+                                    <i class="fas fa-project-diagram"></i>
+                                    <p>Network visualization will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="results-summary">
+                            <h3>Clustering Results</h3>
+                            <div class="metrics">
+                                <div class="metric">
+                                    <span>Silhouette Score:</span>
+                                    <span class="value">-</span>
+                                </div>
+                                <div class="metric">
+                                    <span>Modularity:</span>
+                                    <span class="value">-</span>
+                                </div>
+                                <div class="metric">
+                                    <span>Computation Time:</span>
+                                    <span class="value">-</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <!-- Image Analysis Section -->
+            <section id="image-analysis" class="content-section">
+                <h1>Image Analysis & Clustering</h1>
                 
-                <!-- Visualization Area -->
-                <div class="col-lg-8">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold">Graph Visualization</h6>
-                            <div class="dropdown no-arrow">
-                                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right shadow">
-                                    <a class="dropdown-item" href="#">2D View</a>
-                                    <a class="dropdown-item" href="#">3D View</a>
-                                    <a class="dropdown-item" href="#">Heatmap View</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#">Export Visualization</a>
-                                </div>
+                <div class="analysis-container">
+                    <div class="input-panel">
+                        <div class="panel-section">
+                            <h3>Image Source</h3>
+                            <div class="input-group">
+                                <label for="image-upload">Upload Images</label>
+                                <input type="file" id="image-upload" multiple accept="image/*">
+                            </div>
+                            <div class="uploaded-images">
+                                <p>0 images selected</p>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div id="visualization-area" class="d-flex justify-content-center align-items-center">
-                                <div class="text-center text-muted">
-                                    <i class="fas fa-project-diagram fa-5x mb-3"></i>
-                                    <h5>No data to visualize</h5>
-                                    <p>Import data and run clustering to see results</p>
+
+                        <div class="panel-section">
+                            <h3>Algorithm Selection</h3>
+                            <div class="input-group">
+                                <label>Clustering Method</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="kmeans-image" name="image-algorithm" checked>
+                                    <label for="kmeans-image">K-means</label>
+                                    <input type="radio" id="spectral-image" name="image-algorithm">
+                                    <label for="spectral-image">Spectral</label>
                                 </div>
                             </div>
-                            
-                            <div class="btn-group mt-3">
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-search-plus"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-search-minus"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-arrows-alt"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-home"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="btn-group mt-3 ms-2">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-filter me-1"></i> Filter
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i> Show Labels
-                                </button>
+                            <div class="input-group">
+                                <label for="image-clusters">Number of Clusters</label>
+                                <input type="number" id="image-clusters" min="2" max="20" value="5">
                             </div>
                         </div>
+
+                        <div class="panel-section">
+                            <h3>Feature Extraction</h3>
+                            <div class="input-group">
+                                <label for="feature-method">Feature Method</label>
+                                <select id="feature-method">
+                                    <option value="color">Color Histogram</option>
+                                    <option value="texture">Texture Features</option>
+                                    <option value="cnn">CNN Features</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="feature-dim">Dimensionality</label>
+                                <select id="feature-dim">
+                                    <option value="original">Original</option>
+                                    <option value="pca">PCA Reduction</option>
+                                    <option value="tsne">t-SNE</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary run-btn">Run Image Clustering</button>
                     </div>
-                    
-                    <!-- Results & Analytics -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold">Clustering Results</h6>
+
+                    <div class="visualization-panel">
+                        <div class="viz-controls">
+                            <h3>Clustering Visualization</h3>
+                            <div class="viz-buttons">
+                                <button class="viz-btn active" data-viz="grid"><i class="fas fa-th-large"></i> Grid</button>
+                                <button class="viz-btn" data-viz="scatter"><i class="fas fa-braille"></i> Scatter</button>
+                                <button class="viz-btn" data-viz="dendrogram"><i class="fas fa-sitemap"></i> Dendrogram</button>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body text-center py-4">
-                                            <h4 class="text-primary mb-0">-</h4>
-                                            <div class="text-muted small">Silhouette Score</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body text-center py-4">
-                                            <h4 class="text-primary mb-0">-</h4>
-                                            <div class="text-muted small">Dunn Index</div>
-                                        </div>
-                                    </div>
+                        <div class="viz-container">
+                            <div id="image-visualization" class="viz-area">
+                                <div class="placeholder-viz">
+                                    <i class="fas fa-images"></i>
+                                    <p>Image clustering results will appear here</p>
                                 </div>
                             </div>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Cluster</th>
-                                            <th>Size</th>
-                                            <th>Density</th>
-                                            <th>Key Features</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted">No clustering results available</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        </div>
+                        <div class="results-summary">
+                            <h3>Clustering Results</h3>
+                            <div class="metrics">
+                                <div class="metric">
+                                    <span>Silhouette Score:</span>
+                                    <span class="value">-</span>
+                                </div>
+                                <div class="metric">
+                                    <span>Inertia:</span>
+                                    <span class="value">-</span>
+                                </div>
+                                <div class="metric">
+                                    <span>Computation Time:</span>
+                                    <span class="value">-</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <h1>Settings</h1>
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <h3>Application Settings</h3>
+                        <div class="setting-item">
+                            <label>Dark Mode</label>
+                            <label class="switch">
+                                <input type="checkbox" id="darkMode">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>Auto-save Results</label>
+                            <label class="switch">
+                                <input type="checkbox" id="autoSave" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Algorithm Defaults</h3>
+                        <div class="setting-item">
+                            <label for="default-algorithm">Default Algorithm</label>
+                            <select id="default-algorithm">
+                                <option value="kmeans">K-means</option>
+                                <option value="spectral">Spectral</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="default-clusters">Default Clusters</label>
+                            <input type="number" id="default-clusters" value="5" min="2" max="20">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
-</div>
 
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Custom JavaScript -->
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-    // Store important DOM elements as variables
-    const uploadArea = document.getElementById('uploadArea');
-    const fileUpload = document.getElementById('fileUpload');
-    const runClusteringBtn = document.querySelector('.btn-success');
-    const findOptimalKBtn = document.getElementById('findOptimalK');
-    const clusterSlider = document.getElementById('clusters');
-    const clusterValue = document.getElementById('clusterValue');
-    const visualizationArea = document.getElementById('visualization-area');
     
-    // Upload area functionality
-    uploadArea.addEventListener('click', () => fileUpload.click());
-    
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.classList.add('bg-light');
-    });
-    
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('bg-light');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('bg-light');
-        if (e.dataTransfer.files.length) {
-            fileUpload.files = e.dataTransfer.files;
-            updateFileInfo(e.dataTransfer.files);
-        }
-    });
-    
-    fileUpload.addEventListener('change', function() {
-        updateFileInfo(this.files);
-    });
-    
-    function updateFileInfo(files) {
-        if (files.length > 0) {
-            let msg = `${files.length} file(s) selected`;
-            uploadArea.querySelector('p').textContent = msg;
-        }
-    }
-    
-    // Update cluster value display
-    clusterSlider.addEventListener('input', function() {
-        clusterValue.textContent = this.value;
-    });
-    
-    // Run clustering button event
-    runClusteringBtn.addEventListener('click', function() {
-        if (fileUpload.files.length === 0) {
-            alert('Please select files first');
-            return;
-        }
-        
-        visualizationArea.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
-        
-        // Create proper FormData object
-        const formData = new FormData();
-        formData.append('image', fileUpload.files[0]);
-        formData.append('clusters', clusterSlider.value);
-        formData.append('algorithm', document.getElementById('algorithm').value);
-        formData.append('iterations', document.getElementById('iterations').value);
-        formData.append('normalize', document.getElementById('normalizeData').checked);
-        
-        // Make proper fetch request
-        fetch('/apply_kmeans', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Update visualization with results
-            updateVisualization(data);
-            updateResultsTable(data);
-            updateMetrics(data);
-            updateStats(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            visualizationArea.innerHTML = `
-                <div class="alert alert-danger">
-                    Error running clustering: ${error.message}
-                </div>
-            `;
-        });
-    });
-    
-    // Find optimal K button event
-    findOptimalKBtn.addEventListener('click', function() {
-        if (fileUpload.files.length === 0) {
-            alert('Please upload an image first');
-            return;
-        }
-        
-        const elbowResult = document.getElementById('elbowMethodResult');
-        elbowResult.classList.remove('d-none');
-        elbowResult.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p>Calculating optimal K...</p></div>';
-        
-        const formData = new FormData();
-        formData.append('image', fileUpload.files[0]);
-        
-        fetch('/elbow_method', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            displayElbowChart(data.k_values, data.distortions, data.optimal_k);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            elbowResult.innerHTML = '<div class="alert alert-danger">Error calculating optimal K: ' + error.message + '</div>';
-        });
-    });
-    
-    function displayElbowChart(kValues, distortions, optimalK) {
-        const elbowResult = document.getElementById('elbowMethodResult');
-        elbowResult.classList.remove('d-none');
-        elbowResult.innerHTML = `
-            <h6 class="mb-2">Elbow Method Results</h6>
-            <div id="elbowChart" style="height: 200px; width: 100%;"></div>
-            <div class="text-center mt-2">
-                <span class="badge bg-success">Suggested optimal K: <span id="optimalK">${optimalK}</span></span>
-            </div>
-        `;
-        
-        // Set the K slider value to the optimal K
-        clusterSlider.value = optimalK;
-        clusterValue.textContent = optimalK;
-        
-        // Create proper D3.js chart
-        createElbowChart(kValues, distortions, optimalK);
-    }
-    
-    function createElbowChart(kValues, distortions, optimalK) {
-        // Get dimensions
-        const chartElement = document.getElementById('elbowChart');
-        const width = chartElement.clientWidth;
-        const height = chartElement.clientHeight;
-        const margin = {top: 20, right: 30, bottom: 30, left: 40};
-        
-        // Clear existing chart
-        d3.select("#elbowChart").html("");
-        
-        // Create SVG
-        const svg = d3.select("#elbowChart").append("svg")
-            .attr("width", width)
-            .attr("height", height);
-        
-        // Create scales
-        const xScale = d3.scaleLinear()
-            .domain([d3.min(kValues), d3.max(kValues)])
-            .range([margin.left, width - margin.right]);
-        
-        const yScale = d3.scaleLinear()
-            .domain([0, d3.max(distortions) * 1.1])
-            .range([height - margin.bottom, margin.top]);
-        
-        // Create line generator
-        const line = d3.line()
-            .x(d => xScale(d.k))
-            .y(d => yScale(d.distortion));
-        
-        // Combine data
-        const data = kValues.map((k, i) => ({k, distortion: distortions[i]}));
-        
-        // Add X axis
-        svg.append("g")
-            .attr("transform", `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(xScale).ticks(kValues.length).tickFormat(d3.format('d')));
-        
-        // Add Y axis
-        svg.append("g")
-            .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(yScale));
-        
-        // Add line
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 2)
-            .attr("d", line);
-        
-        // Add points
-        svg.selectAll(".point")
-            .data(data)
-            .enter().append("circle")
-            .attr("class", "point")
-            .attr("cx", d => xScale(d.k))
-            .attr("cy", d => yScale(d.distortion))
-            .attr("r", d => d.k === optimalK ? 6 : 4)
-            .attr("fill", d => d.k === optimalK ? "red" : "steelblue");
-        
-        // Highlight optimal K
-        svg.append("text")
-            .attr("x", xScale(optimalK))
-            .attr("y", yScale(data.find(d => d.k === optimalK).distortion) - 10)
-            .attr("text-anchor", "middle")
-            .style("font-size", "12px")
-            .style("font-weight", "bold")
-            .text("Optimal K");
-    }
-    
-    function updateVisualization(data) {
-        // Implementation for updating visualization with clustering results
-        // This would use D3.js to create a force-directed graph or other visualization
-    }
-    
-    function updateResultsTable(data) {
-        // Implementation for updating the results table
-        const tbody = document.querySelector('.table tbody');
-        tbody.innerHTML = '';
-        
-        data.clusters.forEach((cluster, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>Cluster ${index + 1}</td>
-                <td>${cluster.size}</td>
-                <td>${cluster.density.toFixed(2)}</td>
-                <td>${cluster.features.join(', ')}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-    
-    function updateMetrics(data) {
-        // Implementation for updating metrics
-        const metrics = document.querySelectorAll('.card-body h4');
-        metrics[0].textContent = data.silhouette_score.toFixed(2);
-        metrics[1].textContent = data.dunn_index.toFixed(2);
-    }
-    
-    function updateStats(data) {
-        // Implementation for updating dashboard stats
-        const stats = document.querySelectorAll('.h5.mb-0.fw-bold');
-        stats[0].textContent = data.datasets || '1';
-        stats[1].textContent = data.clusters?.length || '0';
-        stats[2].textContent = '100%';
-        document.querySelector('.progress-bar').style.width = '100%';
-        stats[3].textContent = data.saved_analyses || '1';
-    }
-});
-</script>
-
 </body>
 </html>
