@@ -3,334 +3,1146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GraphCluster - Social Media & Image Analysis</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Advanced Clustering Analysis Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 3.2em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .mode-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .mode-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: translateY(-4px);
+        }
+
+        .mode-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .mode-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .mode-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .config-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+        }
+
+        .config-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .algorithm-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .algorithm-option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .algorithm-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .algorithm-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .algorithm-desc {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .upload-section {
+            display: none;
+        }
+
+        .upload-section.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #ccc;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .file-upload-area:hover .upload-icon {
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .social-media-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .form-input, .form-select {
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .clustering-params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .param-group {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .param-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .param-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .param-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .param-help {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(240, 147, 251, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .results-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .result-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .feature-text {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .main-title {
+                font-size: 2.2em;
+            }
+            
+            .mode-selector {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .algorithm-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-media-config {
+                grid-template-columns: 1fr;
+            }
+            
+            .clustering-params {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <div class="logo">
-                <i class="fas fa-project-diagram"></i>
-                <h2>GraphCluster</h2>
-            </div>
-            <nav>
-                <ul>
-                    <li class="active"><a href="#dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="#social-analysis"><i class="fas fa-users"></i> Social Media</a></li>
-                    <li><a href="#image-analysis"><i class="fas fa-images"></i> Image Analysis</a></li>
-                    <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
-                    <li><a href="#help"><i class="fas fa-question-circle"></i> Help</a></li>
-                </ul>
-            </nav>
+        <div class="header">
+            <h1 class="main-title">Clustering Analysis Platform</h1>
+            <p class="subtitle">Advanced K-Means & Spectral Clustering for Images and Social Media Data</p>
         </div>
 
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <header>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="user-profile">
-                    <span>Welcome, User</span>
-                    <img src="https://via.placeholder.com/40" alt="User Avatar">
-                </div>
-            </header>
+        <div class="feature-highlights">
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">Dual clustering algorithms with optimized performance</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">Support for images and social media datasets</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">Real-time processing with interactive results</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-text">Customizable parameters for fine-tuned analysis</div>
+            </div>
+        </div>
 
-            <!-- Dashboard Section -->
-            <section id="dashboard" class="content-section active">
-                <h1>Dashboard</h1>
-                <div class="quick-stats">
-                    <div class="stat-card">
-                        <h3>Projects</h3>
-                        <p>5</p>
-                        <i class="fas fa-folder"></i>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Datasets</h3>
-                        <p>12</p>
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Visualizations</h3>
-                        <p>24</p>
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                </div>
+        <!-- Mode Selection -->
+        <div class="mode-selector">
+            <div class="mode-card active" data-mode="image">
+                <span class="mode-icon">🖼️</span>
+                <h3 class="mode-title">Image Segmentation</h3>
+                <p class="mode-description">Cluster image pixels based on color similarity for advanced segmentation and visual analysis</p>
+            </div>
+            <div class="mode-card" data-mode="social">
+                <span class="mode-icon">📱</span>
+                <h3 class="mode-title">Social Media Analysis</h3>
+                <p class="mode-description">Analyze and cluster social media datasets to discover patterns and user behavior insights</p>
+            </div>
+        </div>
 
-                <div class="recent-projects">
-                    <h2>Recent Projects</h2>
-                    <div class="project-list">
-                        <div class="project-card">
-                            <h3>Twitter Community Analysis</h3>
-                            <p>Spectral clustering of Twitter communities</p>
-                            <div class="project-meta">
-                                <span>Last updated: 3 days ago</span>
-                                <button class="btn-primary">Open</button>
-                            </div>
-                        </div>
-                        <div class="project-card">
-                            <h3>Instagram Image Categorization</h3>
-                            <p>K-means clustering for image classification</p>
-                            <div class="project-meta">
-                                <span>Last updated: 1 week ago</span>
-                                <button class="btn-primary">Open</button>
-                            </div>
-                        </div>
+        <!-- Configuration Panel -->
+        <div class="config-panel">
+            <!-- Algorithm Selection -->
+            <div class="config-section">
+                <h3 class="section-title">
+                    <span>🔬</span>
+                    Clustering Algorithm
+                </h3>
+                <div class="algorithm-selector">
+                    <div class="algorithm-option selected" data-algorithm="kmeans">
+                        <div class="algorithm-name">K-Means Clustering</div>
+                        <div class="algorithm-desc">Fast and efficient partitioning method ideal for spherical clusters</div>
+                    </div>
+                    <div class="algorithm-option" data-algorithm="spectral">
+                        <div class="algorithm-name">Spectral Clustering</div>
+                        <div class="algorithm-desc">Graph-based method excellent for complex, non-convex cluster shapes</div>
                     </div>
                 </div>
+            </div>
 
-                <div class="create-new">
-                    <h2>Start New Analysis</h2>
-                    <div class="new-options">
-                        <button class="new-btn" id="new-social">
-                            <i class="fas fa-users"></i>
-                            <span>New Social Media Analysis</span>
-                        </button>
-                        <button class="new-btn" id="new-image">
-                            <i class="fas fa-images"></i>
-                            <span>New Image Analysis</span>
-                        </button>
+            <!-- Image Upload Section -->
+            <div class="upload-section active" id="image-upload">
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span>📁</span>
+                        Upload Image
+                    </h3>
+                    <div class="file-upload-area" id="imageDropZone">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">Drop your image here or click to browse</div>
+                        <div class="upload-subtext">Supports JPG, PNG, GIF up to 10MB</div>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Social Media Analysis Section -->
-            <section id="social-analysis" class="content-section">
-                <h1>Social Media Graph Clustering</h1>
-                
-                <div class="analysis-container">
-                    <div class="input-panel">
-                        <div class="panel-section">
-                            <h3>Data Source</h3>
-                            <div class="input-group">
-                                <label for="social-data-upload">Upload Dataset</label>
-                                <input type="file" id="social-data-upload">
-                            </div>
-                            <div class="input-group">
-                                <label for="data-format">Data Format</label>
-                                <select id="data-format">
-                                    <option value="csv">CSV</option>
-                                    <option value="json">JSON</option>
-                                    <option value="graphml">GraphML</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="panel-section">
-                            <h3>Algorithm Selection</h3>
-                            <div class="input-group">
-                                <label>Clustering Method</label>
-                                <div class="radio-group">
-                                    <input type="radio" id="kmeans-social" name="social-algorithm" checked>
-                                    <label for="kmeans-social">K-means</label>
-                                    <input type="radio" id="spectral-social" name="social-algorithm">
-                                    <label for="spectral-social">Spectral</label>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label for="clusters-count">Number of Clusters</label>
-                                <input type="number" id="clusters-count" min="2" max="20" value="5">
-                            </div>
-                        </div>
-
-                        <div class="panel-section">
-                            <h3>Parameters</h3>
-                            <div class="input-group">
-                                <label for="max-iterations">Max Iterations</label>
-                                <input type="number" id="max-iterations" min="10" max="1000" value="100">
-                            </div>
-                            <div class="input-group">
-                                <label for="distance-metric">Distance Metric</label>
-                                <select id="distance-metric">
-                                    <option value="euclidean">Euclidean</option>
-                                    <option value="manhattan">Manhattan</option>
-                                    <option value="cosine">Cosine</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button class="btn-primary run-btn">Run Clustering</button>
-                    </div>
-
-                    <div class="visualization-panel">
-                        <div class="viz-controls">
-                            <h3>Graph Visualization</h3>
-                            <div class="viz-buttons">
-                                <button class="viz-btn active" data-viz="network"><i class="fas fa-project-diagram"></i> Network</button>
-                                <button class="viz-btn" data-viz="heatmap"><i class="fas fa-th"></i> Heatmap</button>
-                                <button class="viz-btn" data-viz="distribution"><i class="fas fa-chart-pie"></i> Distribution</button>
-                            </div>
-                        </div>
-                        <div class="viz-container">
-                            <div id="graph-visualization" class="viz-area">
-                                <div class="placeholder-viz">
-                                    <i class="fas fa-project-diagram"></i>
-                                    <p>Network visualization will appear here</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="results-summary">
-                            <h3>Clustering Results</h3>
-                            <div class="metrics">
-                                <div class="metric">
-                                    <span>Silhouette Score:</span>
-                                    <span class="value">-</span>
-                                </div>
-                                <div class="metric">
-                                    <span>Modularity:</span>
-                                    <span class="value">-</span>
-                                </div>
-                                <div class="metric">
-                                    <span>Computation Time:</span>
-                                    <span class="value">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Image Analysis Section -->
-            <section id="image-analysis" class="content-section">
-                <h1>Image Analysis & Clustering</h1>
-                
-                <div class="analysis-container">
-                    <div class="input-panel">
-                        <div class="panel-section">
-                            <h3>Image Source</h3>
-                            <div class="input-group">
-                                <label for="image-upload">Upload Images</label>
-                                <input type="file" id="image-upload" multiple accept="image/*">
-                            </div>
-                            <div class="uploaded-images">
-                                <p>0 images selected</p>
-                            </div>
-                        </div>
-
-                        <div class="panel-section">
-                            <h3>Algorithm Selection</h3>
-                            <div class="input-group">
-                                <label>Clustering Method</label>
-                                <div class="radio-group">
-                                    <input type="radio" id="kmeans-image" name="image-algorithm" checked>
-                                    <label for="kmeans-image">K-means</label>
-                                    <input type="radio" id="spectral-image" name="image-algorithm">
-                                    <label for="spectral-image">Spectral</label>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label for="image-clusters">Number of Clusters</label>
-                                <input type="number" id="image-clusters" min="2" max="20" value="5">
-                            </div>
-                        </div>
-
-                        <div class="panel-section">
-                            <h3>Feature Extraction</h3>
-                            <div class="input-group">
-                                <label for="feature-method">Feature Method</label>
-                                <select id="feature-method">
-                                    <option value="color">Color Histogram</option>
-                                    <option value="texture">Texture Features</option>
-                                    <option value="cnn">CNN Features</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label for="feature-dim">Dimensionality</label>
-                                <select id="feature-dim">
-                                    <option value="original">Original</option>
-                                    <option value="pca">PCA Reduction</option>
-                                    <option value="tsne">t-SNE</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button class="btn-primary run-btn">Run Image Clustering</button>
-                    </div>
-
-                    <div class="visualization-panel">
-                        <div class="viz-controls">
-                            <h3>Clustering Visualization</h3>
-                            <div class="viz-buttons">
-                                <button class="viz-btn active" data-viz="grid"><i class="fas fa-th-large"></i> Grid</button>
-                                <button class="viz-btn" data-viz="scatter"><i class="fas fa-braille"></i> Scatter</button>
-                                <button class="viz-btn" data-viz="dendrogram"><i class="fas fa-sitemap"></i> Dendrogram</button>
-                            </div>
-                        </div>
-                        <div class="viz-container">
-                            <div id="image-visualization" class="viz-area">
-                                <div class="placeholder-viz">
-                                    <i class="fas fa-images"></i>
-                                    <p>Image clustering results will appear here</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="results-summary">
-                            <h3>Clustering Results</h3>
-                            <div class="metrics">
-                                <div class="metric">
-                                    <span>Silhouette Score:</span>
-                                    <span class="value">-</span>
-                                </div>
-                                <div class="metric">
-                                    <span>Inertia:</span>
-                                    <span class="value">-</span>
-                                </div>
-                                <div class="metric">
-                                    <span>Computation Time:</span>
-                                    <span class="value">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Settings Section -->
-            <section id="settings" class="content-section">
-                <h1>Settings</h1>
-                <div class="settings-container">
-                    <div class="settings-card">
-                        <h3>Application Settings</h3>
-                        <div class="setting-item">
-                            <label>Dark Mode</label>
-                            <label class="switch">
-                                <input type="checkbox" id="darkMode">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div class="setting-item">
-                            <label>Auto-save Results</label>
-                            <label class="switch">
-                                <input type="checkbox" id="autoSave" checked>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <h3>Algorithm Defaults</h3>
-                        <div class="setting-item">
-                            <label for="default-algorithm">Default Algorithm</label>
-                            <select id="default-algorithm">
-                                <option value="kmeans">K-means</option>
-                                <option value="spectral">Spectral</option>
+            <!-- Social Media Section -->
+            <div class="upload-section" id="social-upload">
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span>📊</span>
+                        Social Media Data Source
+                    </h3>
+                    <div class="social-media-config">
+                        <div class="form-group">
+                            <label class="form-label">Platform</label>
+                            <select class="form-select" id="socialPlatform">
+                                <option value="twitter">Twitter/X</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="upload">Upload Dataset</option>
                             </select>
                         </div>
-                        <div class="setting-item">
-                            <label for="default-clusters">Default Clusters</label>
-                            <input type="number" id="default-clusters" value="5" min="2" max="20">
+                        <div class="form-group">
+                            <label class="form-label">Data Type</label>
+                            <select class="form-select" id="dataType">
+                                <option value="posts">Posts/Tweets</option>
+                                <option value="users">User Profiles</option>
+                                <option value="interactions">Interactions</option>
+                                <option value="hashtags">Hashtags</option>
+                            </select>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Search Query or Keywords</label>
+                        <input type="text" class="form-input" id="searchQuery" placeholder="Enter keywords, hashtags, or search terms...">
+                    </div>
+
+                    <div class="file-upload-area" id="datasetDropZone" style="margin-top: 20px;">
+                        <div class="upload-icon">📊</div>
+                        <div class="upload-text">Upload Dataset (CSV/JSON)</div>
+                        <div class="upload-subtext">Or use API to fetch live data</div>
+                        <input type="file" id="datasetInput" accept=".csv,.json" style="display: none;">
+                    </div>
                 </div>
-            </section>
+            </div>
+
+            <!-- Clustering Parameters -->
+            <div class="config-section">
+                <h3 class="section-title">
+                    <span>⚙️</span>
+                    Clustering Parameters
+                </h3>
+                <div class="clustering-params">
+                    <div class="param-group">
+                        <div class="param-label">Number of Clusters</div>
+                        <input type="number" class="param-input" id="numClusters" value="5" min="2" max="20">
+                        <div class="param-help">Choose between 2-20 clusters based on your data complexity</div>
+                    </div>
+                    
+                    <div class="param-group" id="kmeansParams">
+                        <div class="param-label">Max Iterations</div>
+                        <input type="number" class="param-input" id="maxIterations" value="100" min="10" max="1000">
+                        <div class="param-help">Maximum iterations for convergence (K-means only)</div>
+                    </div>
+                    
+                    <div class="param-group" id="spectralParams" style="display: none;">
+                        <div class="param-label">Gamma Parameter</div>
+                        <input type="number" class="param-input" id="gamma" value="1.0" step="0.1" min="0.1" max="10.0">
+                        <div class="param-help">RBF kernel parameter for spectral clustering</div>
+                    </div>
+                    
+                    <div class="param-group">
+                        <div class="param-label">Random State</div>
+                        <input type="number" class="param-input" id="randomState" value="42" min="0" max="999">
+                        <div class="param-help">Seed for reproducible results</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="startClustering" disabled>
+                    🚀 Start Clustering
+                </button>
+                <button class="btn btn-secondary" id="resetForm">
+                    🔄 Reset Configuration
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h3 class="section-title">
+                <span>📈</span>
+                Clustering Results
+            </h3>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
         </div>
     </div>
 
-    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Processing your data...</h3>
+            <p>This may take a few moments depending on the complexity</p>
+        </div>
+    </div>
+
+    <script>
+        class ClusteringApp {
+            constructor() {
+                this.currentMode = 'image';
+                this.currentAlgorithm = 'kmeans';
+                this.uploadedFile = null;
+                
+                this.initEventListeners();
+                this.updateUI();
+            }
+
+            initEventListeners() {
+                // Mode selection
+                document.querySelectorAll('.mode-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        this.switchMode(card.dataset.mode);
+                    });
+                });
+
+                // Algorithm selection
+                document.querySelectorAll('.algorithm-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.switchAlgorithm(option.dataset.algorithm);
+                    });
+                });
+
+                // File upload handlers
+                this.setupFileUpload('imageDropZone', 'imageInput');
+                this.setupFileUpload('datasetDropZone', 'datasetInput');
+
+                // Form controls
+                document.getElementById('startClustering').addEventListener('click', () => {
+                    this.startClustering();
+                });
+
+                document.getElementById('resetForm').addEventListener('click', () => {
+                    this.resetForm();
+                });
+
+                // Social platform change
+                document.getElementById('socialPlatform').addEventListener('change', (e) => {
+                    this.updateSocialConfig(e.target.value);
+                });
+
+                // Parameter validation
+                document.querySelectorAll('.param-input').forEach(input => {
+                    input.addEventListener('input', () => {
+                        this.validateParameters();
+                    });
+                });
+            }
+
+            switchMode(mode) {
+                this.currentMode = mode;
+                
+                // Update mode cards
+                document.querySelectorAll('.mode-card').forEach(card => {
+                    card.classList.toggle('active', card.dataset.mode === mode);
+                });
+
+                // Update upload sections
+                document.querySelectorAll('.upload-section').forEach(section => {
+                    section.classList.toggle('active', section.id === `${mode}-upload`);
+                });
+
+                this.uploadedFile = null;
+                this.updateUI();
+            }
+
+            switchAlgorithm(algorithm) {
+                this.currentAlgorithm = algorithm;
+                
+                // Update algorithm options
+                document.querySelectorAll('.algorithm-option').forEach(option => {
+                    option.classList.toggle('selected', option.dataset.algorithm === algorithm);
+                });
+
+                // Show/hide algorithm-specific parameters
+                document.getElementById('kmeansParams').style.display = 
+                    algorithm === 'kmeans' ? 'block' : 'none';
+                document.getElementById('spectralParams').style.display = 
+                    algorithm === 'spectral' ? 'block' : 'none';
+
+                this.validateParameters();
+            }
+
+            setupFileUpload(dropZoneId, inputId) {
+                const dropZone = document.getElementById(dropZoneId);
+                const fileInput = document.getElementById(inputId);
+
+                dropZone.addEventListener('click', () => fileInput.click());
+
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('dragover');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFileUpload(files[0], dropZoneId);
+                    }
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleFileUpload(e.target.files[0], dropZoneId);
+                    }
+                });
+            }
+
+            handleFileUpload(file, dropZoneId) {
+                this.uploadedFile = file;
+                const dropZone = document.getElementById(dropZoneId);
+                
+                // Update drop zone to show file info
+                dropZone.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <div class="upload-text">File uploaded: ${file.name}</div>
+                    <div class="upload-subtext">Size: ${this.formatFileSize(file.size)}</div>
+                `;
+
+                this.validateParameters();
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            updateSocialConfig(platform) {
+                const dataTypeSelect = document.getElementById('dataType');
+                const searchQuery = document.getElementById('searchQuery');
+                
+                if (platform === 'upload') {
+                    searchQuery.style.display = 'none';
+                    document.getElementById('datasetDropZone').style.display = 'block';
+                } else {
+                    searchQuery.style.display = 'block';
+                    document.getElementById('datasetDropZone').style.display = 'none';
+                }
+
+                this.validateParameters();
+            }
+
+            validateParameters() {
+                const startBtn = document.getElementById('startClustering');
+                let isValid = true;
+
+                // Check if file is uploaded or social data is configured
+                if (this.currentMode === 'image') {
+                    isValid = this.uploadedFile !== null;
+                } else {
+                    const platform = document.getElementById('socialPlatform').value;
+                    const query = document.getElementById('searchQuery').value.trim();
+                    isValid = (platform === 'upload' && this.uploadedFile !== null) || 
+                             (platform !== 'upload' && query.length > 0);
+                }
+
+                // Check clustering parameters
+                const numClusters = parseInt(document.getElementById('numClusters').value);
+                isValid = isValid && numClusters >= 2 && numClusters <= 20;
+
+                startBtn.disabled = !isValid;
+            }
+
+            updateUI() {
+                this.validateParameters();
+            }
+
+            async startClustering() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.display = 'flex';
+
+                try {
+                    // Prepare form data
+                    const formData = new FormData();
+                    formData.append('mode', this.currentMode);
+                    formData.append('algorithm', this.currentAlgorithm);
+                    formData.append('num_clusters', document.getElementById('numClusters').value);
+                    formData.append('random_state', document.getElementById('randomState').value);
+
+                    if (this.currentAlgorithm === 'kmeans') {
+                        formData.append('max_iterations', document.getElementById('maxIterations').value);
+                    } else {
+                        formData.append('gamma', document.getElementById('gamma').value);
+                    }
+
+                    if (this.currentMode === 'image') {
+                        formData.append('file', this.uploadedFile);
+                    } else {
+                        formData.append('platform', document.getElementById('socialPlatform').value);
+                        formData.append('data_type', document.getElementById('dataType').value);
+                        
+                        const platform = document.getElementById('socialPlatform').value;
+                        if (platform === 'upload') {
+                            formData.append('file', this.uploadedFile);
+                        } else {
+                            formData.append('search_query', document.getElementById('searchQuery').value);
+                        }
+                    }
+
+                    // Send request to Flask backend
+                    const response = await fetch('/cluster', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    this.displayResults(result);
+
+                } catch (error) {
+                    console.error('Clustering error:', error);
+                    this.showError('An error occurred during clustering. Please try again.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+
+            displayResults(result) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsGrid = document.getElementById('resultsGrid');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = '';
+
+                // Create results based on mode
+                if (this.currentMode === 'image') {
+                    this.displayImageResults(result, resultsGrid);
+                } else {
+                    this.displaySocialResults(result, resultsGrid);
+                }
+
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            displayImageResults(result, container) {
+                // Original and segmented images
+                const imagesCard = document.createElement('div');
+                imagesCard.className = 'result-card';
+                imagesCard.innerHTML = `
+                    <h4 class="result-title">🖼️ Image Segmentation Results</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h5 style="margin-bottom: 10px; color: #666;">Original Image</h5>
+                            <img src="data:image/png;base64,${result.original_image}" 
+                                 style="width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        </div>
+                        <div>
+                            <h5 style="margin-bottom: 10px; color: #666;">Segmented Image</h5>
+                            <img src="data:image/png;base64,${result.segmented_image}" 
+                                 style="width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+                `;
+
+                // Clustering statistics
+                const statsCard = document.createElement('div');
+                statsCard.className = 'result-card';
+                statsCard.innerHTML = `
+                    <h4 class="result-title">📊 Clustering Statistics</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #667eea;">${result.num_clusters}</div>
+                            <div style="color: #666;">Clusters</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(118, 75, 162, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #764ba2;">${result.processing_time}s</div>
+                            <div style="color: #666;">Processing Time</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(240, 147, 251, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #f093fb;">${result.pixels_processed}</div>
+                            <div style="color: #666;">Pixels Processed</div>
+                        </div>
+                    </div>
+                `;
+
+                // Color palette
+                if (result.color_palette) {
+                    const paletteCard = document.createElement('div');
+                    paletteCard.className = 'result-card';
+                    paletteCard.innerHTML = `
+                        <h4 class="result-title">🎨 Extracted Color Palette</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                            ${result.color_palette.map(color => `
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                    <div style="width: 60px; height: 60px; background-color: rgb(${color.join(',')}); 
+                                                border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);"></div>
+                                    <div style="font-size: 0.8em; color: #666;">RGB(${color.join(',')})</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(paletteCard);
+                }
+
+                container.appendChild(imagesCard);
+                container.appendChild(statsCard);
+            }
+
+            displaySocialResults(result, container) {
+                // Cluster overview
+                const overviewCard = document.createElement('div');
+                overviewCard.className = 'result-card';
+                overviewCard.innerHTML = `
+                    <h4 class="result-title">📱 Social Media Clustering Results</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #667eea;">${result.total_data_points}</div>
+                            <div style="color: #666;">Data Points</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(118, 75, 162, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #764ba2;">${result.num_clusters}</div>
+                            <div style="color: #666;">Clusters</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(240, 147, 251, 0.1); border-radius: 10px;">
+                            <div style="font-size: 2em; font-weight: bold; color: #f093fb;">${result.processing_time}s</div>
+                            <div style="color: #666;">Processing Time</div>
+                        </div>
+                    </div>
+                `;
+
+                // Cluster details
+                if (result.clusters) {
+                    const clustersCard = document.createElement('div');
+                    clustersCard.className = 'result-card';
+                    let clustersHTML = `
+                        <h4 class="result-title">🔍 Cluster Analysis</h4>
+                        <div style="display: grid; gap: 20px;">
+                    `;
+
+                    result.clusters.forEach((cluster, index) => {
+                        clustersHTML += `
+                            <div style="border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px;">
+                                <h5 style="color: #333; margin-bottom: 15px;">
+                                    Cluster ${index + 1} (${cluster.size} items)
+                                </h5>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <strong>Top Keywords:</strong>
+                                        <div style="margin-top: 5px;">
+                                            ${cluster.keywords.map(kw => 
+                                                `<span style="background: rgba(102, 126, 234, 0.1); 
+                                                         padding: 4px 8px; border-radius: 6px; 
+                                                         font-size: 0.85em; margin-right: 5px;">${kw}</span>`
+                                            ).join('')}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong>Characteristics:</strong>
+                                        <ul style="margin-top: 5px; padding-left: 20px; font-size: 0.9em; color: #666;">
+                                            ${cluster.characteristics.map(char => `<li>${char}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    clustersHTML += '</div>';
+                    clustersCard.innerHTML = clustersHTML;
+                    container.appendChild(clustersCard);
+                }
+
+                // Visualization
+                if (result.visualization) {
+                    const vizCard = document.createElement('div');
+                    vizCard.className = 'result-card';
+                    vizCard.innerHTML = `
+                        <h4 class="result-title">📈 Cluster Visualization</h4>
+                        <div style="text-align: center;">
+                            <img src="data:image/png;base64,${result.visualization}" 
+                                 style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        </div>
+                    `;
+                    container.appendChild(vizCard);
+                }
+
+                container.appendChild(overviewCard);
+            }
+
+            showError(message) {
+                const errorCard = document.createElement('div');
+                errorCard.className = 'result-card';
+                errorCard.style.borderLeft = '4px solid #ff6b6b';
+                errorCard.innerHTML = `
+                    <h4 class="result-title" style="color: #ff6b6b;">❌ Error</h4>
+                    <p style="color: #666; margin-top: 10px;">${message}</p>
+                `;
+
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsGrid = document.getElementById('resultsGrid');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = '';
+                resultsGrid.appendChild(errorCard);
+                
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            resetForm() {
+                // Reset all form fields
+                document.getElementById('numClusters').value = '5';
+                document.getElementById('maxIterations').value = '100';
+                document.getElementById('gamma').value = '1.0';
+                document.getElementById('randomState').value = '42';
+                document.getElementById('searchQuery').value = '';
+                
+                // Reset file uploads
+                this.uploadedFile = null;
+                document.getElementById('imageInput').value = '';
+                document.getElementById('datasetInput').value = '';
+                
+                // Reset drop zones
+                document.getElementById('imageDropZone').innerHTML = `
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">Drop your image here or click to browse</div>
+                    <div class="upload-subtext">Supports JPG, PNG, GIF up to 10MB</div>
+                `;
+                
+                document.getElementById('datasetDropZone').innerHTML = `
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-text">Upload Dataset (CSV/JSON)</div>
+                    <div class="upload-subtext">Or use API to fetch live data</div>
+                `;
+
+                // Hide results
+                document.getElementById('resultsSection').style.display = 'none';
+                
+                // Reset to defaults
+                this.switchMode('image');
+                this.switchAlgorithm('kmeans');
+                
+                this.validateParameters();
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new ClusteringApp();
+        });
+    </script>
 </body>
 </html>
