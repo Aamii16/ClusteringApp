@@ -1,0 +1,15 @@
+Facebook Network Community Analysis Summary
+Analysis Date: 2025-06-03 20:18:25
+Analyst: Aamii16
+
+Network Statistics:
+- Nodes: 4,039
+- Edges: 88,234
+- Density: 0.010820
+
+Community Detection Results:
+- Algorithm: Louvain Method
+- Communities: 17
+- Modularity: 0.8358
+- Largest Community: 548 nodes
+- Average Community Size: 237.59 nodes
